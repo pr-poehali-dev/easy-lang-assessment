@@ -7,6 +7,8 @@ import Icon from '@/components/ui/icon';
 
 const Index = () => {
   const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
+  const [testStep, setTestStep] = useState<number>(0);
+  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
 
   const languages = [
     { code: 'en', name: 'Английский', flag: '🇬🇧', learners: '2.5M+' },
@@ -17,6 +19,21 @@ const Index = () => {
     { code: 'zh', name: 'Китайский', flag: '🇨🇳', learners: '750K+' },
     { code: 'ja', name: 'Японский', flag: '🇯🇵', learners: '620K+' },
     { code: 'ko', name: 'Корейский', flag: '🇰🇷', learners: '580K+' },
+  ];
+  
+  const demoQuestions = [
+    {
+      question: 'Choose the correct form of the verb:',
+      text: 'She _____ to the store yesterday.',
+      options: ['go', 'goes', 'went', 'going'],
+      correct: 'went'
+    },
+    {
+      question: 'Select the right preposition:',
+      text: 'I will meet you _____ 5 PM.',
+      options: ['in', 'at', 'on', 'for'],
+      correct: 'at'
+    }
   ];
 
   const features = [
@@ -176,12 +193,249 @@ const Index = () => {
         </div>
       </section>
 
-      <section id="features" className="py-20 bg-white">
+      <section className="py-20 bg-gradient-to-br from-primary/5 to-secondary/5">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <Badge className="mb-4 bg-primary/10 text-primary">Попробуйте прямо сейчас</Badge>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Демо-тест без регистрации</h2>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              Проверьте как работает наша система за 2 минуты
+            </p>
+          </div>
+          
+          <div className="max-w-3xl mx-auto">
+            <Card className="border-2">
+              <CardContent className="p-8">
+                {testStep === 0 ? (
+                  <div className="text-center space-y-6">
+                    <div className="w-20 h-20 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center mx-auto">
+                      <Icon name="Languages" size={40} className="text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-bold mb-2">Выберите язык для теста</h3>
+                      <p className="text-muted-foreground">Мы проверим ваш базовый уровень владения языком</p>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      {languages.slice(0, 4).map((lang) => (
+                        <Button
+                          key={lang.code}
+                          variant={selectedLanguage === lang.code ? "default" : "outline"}
+                          className="h-auto py-4 flex flex-col items-center gap-2"
+                          onClick={() => setSelectedLanguage(lang.code)}
+                        >
+                          <span className="text-3xl">{lang.flag}</span>
+                          <span className="text-sm">{lang.name}</span>
+                        </Button>
+                      ))}
+                    </div>
+                    <Button 
+                      size="lg" 
+                      className="w-full"
+                      disabled={!selectedLanguage}
+                      onClick={() => setTestStep(1)}
+                    >
+                      Начать тест
+                      <Icon name="ArrowRight" className="ml-2" size={20} />
+                    </Button>
+                  </div>
+                ) : testStep <= demoQuestions.length ? (
+                  <div className="space-y-6">
+                    <div className="flex justify-between items-center">
+                      <Badge variant="outline">Вопрос {testStep} из {demoQuestions.length}</Badge>
+                      <div className="flex gap-1">
+                        {demoQuestions.map((_, i) => (
+                          <div 
+                            key={i} 
+                            className={`w-12 h-1 rounded ${i < testStep ? 'bg-primary' : 'bg-muted'}`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <h3 className="text-xl font-semibold">{demoQuestions[testStep - 1].question}</h3>
+                      <p className="text-lg">{demoQuestions[testStep - 1].text}</p>
+                      
+                      <div className="grid gap-3">
+                        {demoQuestions[testStep - 1].options.map((option) => (
+                          <Button
+                            key={option}
+                            variant={selectedAnswer === option ? "default" : "outline"}
+                            className="justify-start h-auto py-4 text-left"
+                            onClick={() => setSelectedAnswer(option)}
+                          >
+                            {option}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <Button 
+                      size="lg" 
+                      className="w-full"
+                      disabled={!selectedAnswer}
+                      onClick={() => {
+                        setSelectedAnswer(null);
+                        setTestStep(testStep + 1);
+                      }}
+                    >
+                      Следующий вопрос
+                      <Icon name="ArrowRight" className="ml-2" size={20} />
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="text-center space-y-6">
+                    <div className="w-20 h-20 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto">
+                      <Icon name="CheckCircle2" size={40} className="text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-bold mb-2">Отличная работа!</h3>
+                      <p className="text-muted-foreground mb-4">Ваш результат анализируется...</p>
+                      <div className="bg-muted rounded-lg p-6 space-y-4">
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium">Предварительный уровень:</span>
+                          <Badge className="text-lg px-4 py-1">B1</Badge>
+                        </div>
+                        <div className="space-y-2 text-sm text-left">
+                          <div className="flex items-start gap-2">
+                            <Icon name="Sparkles" size={16} className="text-primary mt-1" />
+                            <span><strong>ИИ анализ:</strong> Хорошее понимание грамматики</span>
+                          </div>
+                          <div className="flex items-start gap-2">
+                            <Icon name="User" size={16} className="text-secondary mt-1" />
+                            <span><strong>Рекомендация преподавателя:</strong> Работайте над временами</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <Button size="lg" className="w-full">
+                      Получить полный отчёт
+                      <Icon name="FileText" className="ml-2" size={20} />
+                    </Button>
+                    <Button variant="outline" onClick={() => { setTestStep(0); setSelectedLanguage(null); }}>
+                      Пройти ещё раз
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Почему выбирают EasyLang</h2>
+            <Badge className="mb-4 bg-secondary/10 text-secondary">Наше преимущество</Badge>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Как работает двойная проверка</h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Уникальная технология оценки, которой нет у конкурентов
+              Единственная платформа, где ИИ обучается на опыте реальных преподавателей
+            </p>
+          </div>
+          
+          <div className="max-w-5xl mx-auto mb-16">
+            <div className="grid md:grid-cols-2 gap-8 items-center">
+              <div className="space-y-6">
+                <div className="flex gap-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-primary/20 to-primary/30 rounded-full flex items-center justify-center flex-shrink-0">
+                    <span className="text-primary font-bold text-xl">1</span>
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold mb-2">ИИ анализ</h3>
+                    <p className="text-muted-foreground">
+                      Искусственный интеллект моментально проверяет грамматику, лексику и структуру ваших ответов по 50+ параметрам
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex gap-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-secondary/20 to-secondary/30 rounded-full flex items-center justify-center flex-shrink-0">
+                    <span className="text-secondary font-bold text-xl">2</span>
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold mb-2">Проверка преподавателем</h3>
+                    <p className="text-muted-foreground">
+                      Квалифицированный специалист анализирует результаты ИИ, добавляет контекст и личные рекомендации
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex gap-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-accent/20 to-accent/30 rounded-full flex items-center justify-center flex-shrink-0">
+                    <span className="text-accent font-bold text-xl">3</span>
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold mb-2">Обучение системы</h3>
+                    <p className="text-muted-foreground">
+                      Каждая проверка преподавателя обучает ИИ, передавая многолетний опыт и методики. Система становится умнее с каждым тестом
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <Card className="p-8 bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5 border-2">
+                <div className="space-y-6">
+                  <div className="flex items-center gap-3">
+                    <Icon name="Brain" size={32} className="text-primary" />
+                    <div className="flex-1">
+                      <div className="text-sm text-muted-foreground mb-1">ИИ анализ</div>
+                      <div className="h-2 bg-muted rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-primary to-primary/60 w-[95%]"></div>
+                      </div>
+                    </div>
+                    <span className="font-bold text-primary">95%</span>
+                  </div>
+                  
+                  <Icon name="Plus" size={20} className="text-muted-foreground mx-auto block" />
+                  
+                  <div className="flex items-center gap-3">
+                    <Icon name="User" size={32} className="text-secondary" />
+                    <div className="flex-1">
+                      <div className="text-sm text-muted-foreground mb-1">Опыт преподавателя</div>
+                      <div className="h-2 bg-muted rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-secondary to-secondary/60 w-[98%]"></div>
+                      </div>
+                    </div>
+                    <span className="font-bold text-secondary">98%</span>
+                  </div>
+                  
+                  <Icon name="ArrowDown" size={20} className="text-muted-foreground mx-auto block" />
+                  
+                  <div className="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg p-4 text-center">
+                    <div className="text-sm mb-1">Точность оценки</div>
+                    <div className="text-3xl font-bold">99.2%</div>
+                    <div className="text-xs opacity-90 mt-1">Подтверждено международными экспертами</div>
+                  </div>
+                </div>
+              </Card>
+            </div>
+          </div>
+          
+          <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-8 md:p-12 max-w-5xl mx-auto">
+            <div className="grid md:grid-cols-3 gap-8 text-center">
+              <div>
+                <div className="text-4xl font-bold text-primary mb-2">15+ лет</div>
+                <p className="text-muted-foreground">Средний опыт наших преподавателей</p>
+              </div>
+              <div>
+                <div className="text-4xl font-bold text-secondary mb-2">50K+</div>
+                <p className="text-muted-foreground">Проверок обучили нашу систему</p>
+              </div>
+              <div>
+                <div className="text-4xl font-bold text-accent mb-2">24/7</div>
+                <p className="text-muted-foreground">Доступность ИИ-ассистента</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="features" className="py-20 bg-gradient-to-br from-orange-50 to-blue-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Все возможности платформы</h2>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              Полный набор инструментов для точной оценки языковых навыков
             </p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
